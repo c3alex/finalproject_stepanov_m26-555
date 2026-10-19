@@ -1,0 +1,26 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Tools caches
+.ruff_cache/
+
+# Logs
+logs/
+*.log
+
+# Secrets
+.env
+
+# OS
+.DS_Store
+
+# Task description (not part of the project)
+general_task.md
