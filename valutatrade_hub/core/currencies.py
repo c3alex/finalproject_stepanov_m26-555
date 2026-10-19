@@ -118,9 +118,11 @@ class CryptoCurrency(Currency):
 
     def get_display_info(self) -> str:
         """Возвращает строку вида "[CRYPTO] BTC — Bitcoin (Algo: ..., MCAP: ...)"."""
+        mantissa, exponent = f"{self.market_cap:.2e}".split("e")
+        mcap = f"{mantissa}e{int(exponent)}"
         return (
             f"[CRYPTO] {self.code} — {self.name} "
-            f"(Algo: {self.algorithm}, MCAP: {self.market_cap:.2e})"
+            f"(Algo: {self.algorithm}, MCAP: {mcap})"
         )
 
 
