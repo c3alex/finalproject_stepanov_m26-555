@@ -216,7 +216,7 @@ Rates from cache (updated at 2026-10-19T18:44:21Z):
 
 ## Демо
 
-[![asciicast](https://asciinema.org/a/ID_ЗАПИСИ.svg)](https://asciinema.org/a/ID_ЗАПИСИ)
+[![asciicast](https://asciinema.org/a/4BGDhGFAjsYRlgry.svg)](https://asciinema.org/a/4BGDhGFAjsYRlgry)
 
 Локальная запись: [`docs/demo.cast`](docs/demo.cast) (воспроизвести:
 `asciinema play docs/demo.cast`). Показан полный цикл register → login →
