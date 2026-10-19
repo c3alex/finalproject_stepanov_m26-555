@@ -116,9 +116,7 @@ class DatabaseManager:
         data.setdefault("last_refresh", None)
         return data
 
-    def update(
-        self, path: Path, default: Any, modifier: Callable[[Any], Any]
-    ) -> Any:
+    def update(self, path: Path, default: Any, modifier: Callable[[Any], Any]) -> Any:
         """Безопасная операция «чтение → модификация → запись».
 
         Если modifier выбросит исключение, файл не изменится.

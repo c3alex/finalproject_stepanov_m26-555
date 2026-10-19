@@ -38,9 +38,7 @@ def _validate_password(password: str) -> None:
         ValueError: Пароль не строка или короче MIN_PASSWORD_LENGTH символов.
     """
     if not isinstance(password, str) or len(password) < MIN_PASSWORD_LENGTH:
-        raise ValueError(
-            f"Пароль должен быть не короче {MIN_PASSWORD_LENGTH} символов"
-        )
+        raise ValueError(f"Пароль должен быть не короче {MIN_PASSWORD_LENGTH} символов")
 
 
 class User:

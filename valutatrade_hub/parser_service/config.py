@@ -2,7 +2,7 @@
 
 API-ключ ExchangeRate-API не хранится в коде: он берётся из переменной
 окружения EXCHANGERATE_API_KEY или из файла .env в корне проекта
-(файл добавлен в .gitignore).
+(файл добавлен в .gitignore). Без ключа используется открытый эндпоинт.
 """
 
 import os
@@ -50,6 +50,9 @@ class ParserConfig:
     # Эндпоинты
     COINGECKO_URL: str = "https://api.coingecko.com/api/v3/simple/price"
     EXCHANGERATE_API_URL: str = "https://v6.exchangerate-api.com/v6"
+    # Открытый (бесплатный, без ключа) эндпоинт ExchangeRate-API: используется,
+    # если ключ не задан; обновляется раз в сутки и имеет более строгий лимит.
+    EXCHANGERATE_OPEN_URL: str = "https://open.er-api.com/v6"
 
     # Списки валют
     BASE_CURRENCY: str = "USD"
@@ -76,4 +79,3 @@ class ParserConfig:
 
     # Планировщик: интервал периодического обновления по умолчанию
     UPDATE_INTERVAL_SECONDS: int = 300
-

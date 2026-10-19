@@ -140,3 +140,27 @@ class NotLoggedInError(ValutaTradeError):
     def __init__(self) -> None:
         """Формирует стандартное сообщение о необходимости входа."""
         super().__init__("Сначала выполните login")
+
+
+class RatesCacheEmptyError(ValutaTradeError):
+    """Локальный кеш курсов rates.json пуст или отсутствует."""
+
+    def __init__(self) -> None:
+        """Формирует сообщение с подсказкой выполнить update-rates."""
+        super().__init__(
+            "Локальный кеш курсов пуст. Выполните 'update-rates', "
+            "чтобы загрузить данные."
+        )
+
+
+class RateNotInCacheError(ValutaTradeError):
+    """Курс для указанной валюты отсутствует в локальном кеше."""
+
+    def __init__(self, code: str) -> None:
+        """Формирует сообщение об отсутствии курса в кеше.
+
+        Args:
+            code: Код валюты, для которой нет курса.
+        """
+        self.code = code
+        super().__init__(f"Курс для '{code}' не найден в кеше.")

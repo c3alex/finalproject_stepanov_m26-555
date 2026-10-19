@@ -10,7 +10,9 @@ BASE_CURRENCY = "USD"
 FIAT_DECIMALS = 2
 CRYPTO_DECIMALS = 4
 RATE_DECIMALS_SMALL = 8
+RATE_DECIMALS_MEDIUM = 4
 RATE_DECIMALS_LARGE = 2
+LARGE_RATE_THRESHOLD = 1000
 
 
 def validate_currency_code(code: str) -> str:
@@ -182,8 +184,11 @@ def format_money(value: float) -> str:
 
 
 def format_rate(rate: float) -> str:
-    """Форматирует курс: 2 знака для курсов ≥ 1, до 8 знаков для малых курсов."""
-    if rate >= 1:
+    """Форматирует курс: 2 знака для курсов ≥ 1000, 4 — для курсов ≥ 1,
+    до 8 значащих знаков после запятой — для малых курсов."""
+    if rate >= LARGE_RATE_THRESHOLD:
         return f"{rate:.{RATE_DECIMALS_LARGE}f}"
+    if rate >= 1:
+        return f"{rate:.{RATE_DECIMALS_MEDIUM}f}"
     formatted = f"{rate:.{RATE_DECIMALS_SMALL}f}".rstrip("0")
     return formatted if not formatted.endswith(".") else formatted + "0"

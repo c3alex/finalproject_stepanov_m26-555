@@ -88,9 +88,7 @@ class FiatCurrency(Currency):
 
     def get_display_info(self) -> str:
         """Возвращает строку вида "[FIAT] USD — US Dollar (Issuing: ...)"."""
-        return (
-            f"[FIAT] {self.code} — {self.name} (Issuing: {self.issuing_country})"
-        )
+        return f"[FIAT] {self.code} — {self.name} (Issuing: {self.issuing_country})"
 
 
 class CryptoCurrency(Currency):
@@ -101,9 +99,7 @@ class CryptoCurrency(Currency):
         market_cap: Последняя известная капитализация в USD.
     """
 
-    def __init__(
-        self, name: str, code: str, algorithm: str, market_cap: float
-    ) -> None:
+    def __init__(self, name: str, code: str, algorithm: str, market_cap: float) -> None:
         """Создаёт криптовалюту.
 
         Args:
@@ -121,8 +117,7 @@ class CryptoCurrency(Currency):
         mantissa, exponent = f"{self.market_cap:.2e}".split("e")
         mcap = f"{mantissa}e{int(exponent)}"
         return (
-            f"[CRYPTO] {self.code} — {self.name} "
-            f"(Algo: {self.algorithm}, MCAP: {mcap})"
+            f"[CRYPTO] {self.code} — {self.name} (Algo: {self.algorithm}, MCAP: {mcap})"
         )
 
 

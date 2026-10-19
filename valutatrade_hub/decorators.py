@@ -12,18 +12,29 @@ import logging
 from collections.abc import Callable
 from typing import Any
 
+from valutatrade_hub.core.utils import format_rate
 from valutatrade_hub.logging_config import ACTIONS_LOGGER_NAME
 
 RESULT_OK = "OK"
 RESULT_ERROR = "ERROR"
 SMALL_FLOAT_THRESHOLD = 0.01
+# Поля со значениями-«метками», которые пишутся без кавычек: result=OK
+UNQUOTED_FIELDS = ("result", "error_type")
 
 
-def _format_value(value: Any) -> str:
-    """Форматирует значение поля лога: строки — в кавычках, float — 4/8 знаков."""
+def _format_value(key: str, value: Any) -> str:
+    """Форматирует значение поля лога.
+
+    Строки — в кавычках (кроме UNQUOTED_FIELDS), курс — через format_rate(),
+    остальные float — 4 знака (8 для очень малых значений).
+    """
+    if key in UNQUOTED_FIELDS:
+        return str(value)
     if isinstance(value, str):
         return f"'{value}'"
     if isinstance(value, float):
+        if key == "rate":
+            return format_rate(value)
         decimals = 4 if abs(value) >= SMALL_FLOAT_THRESHOLD or value == 0 else 8
         return f"{value:.{decimals}f}"
     return str(value)
@@ -45,13 +56,19 @@ def _collect_context(
     if "currency_code" in arguments:
         context["currency"] = str(arguments["currency_code"]).upper()
     if "amount" in arguments:
-        context["amount"] = arguments["amount"]
+        context["amount"] = _as_number(arguments["amount"])
     return context
 
 
-def _enrich_from_result(
-    context: dict[str, Any], result: Any, verbose: bool
-) -> None:
+def _as_number(value: Any) -> Any:
+    """Пытается привести значение (например, строку из CLI) к float."""
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return value
+
+
+def _enrich_from_result(context: dict[str, Any], result: Any, verbose: bool) -> None:
     """Дополняет контекст данными из результата операции (если это dict)."""
     if not isinstance(result, dict):
         return
@@ -61,9 +78,7 @@ def _enrich_from_result(
         if result.get(key) is not None:
             context[key] = result[key]
     if verbose and "old_balance" in result and "new_balance" in result:
-        context["wallet"] = (
-            f"{result['old_balance']:.4f}->{result['new_balance']:.4f}"
-        )
+        context["wallet"] = f"{result['old_balance']:.4f}->{result['new_balance']:.4f}"
 
 
 def log_action(
@@ -109,7 +124,9 @@ def log_action(
 
 def _write(logger: logging.Logger, action: str, context: dict[str, Any]) -> None:
     """Пишет запись вида "BUY user='alice' currency='BTC' ... result=OK"."""
-    fields = " ".join(f"{key}={_format_value(val)}" for key, val in context.items())
+    fields = " ".join(
+        f"{key}={_format_value(key, val)}" for key, val in context.items()
+    )
     logger.info(
         "%s %s", action, fields, extra={"action_data": {"action": action, **context}}
     )

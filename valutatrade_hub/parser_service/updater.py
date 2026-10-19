@@ -117,7 +117,10 @@ class RatesUpdater:
                 }
                 history.append(
                     self._history_record(
-                        pair, rate, timestamp, client.source_name,
+                        pair,
+                        rate,
+                        timestamp,
+                        client.source_name,
                         client.last_meta.get(pair, {}),
                     )
                 )
@@ -150,9 +153,7 @@ class RatesUpdater:
         selected = [client for client in self.clients if client.source_key == key]
         if not selected:
             available = ", ".join(self.source_keys)
-            raise ValueError(
-                f"Неизвестный источник '{source}'. Доступные: {available}"
-            )
+            raise ValueError(f"Неизвестный источник '{source}'. Доступные: {available}")
         return selected
 
     def _display_path(self) -> str:

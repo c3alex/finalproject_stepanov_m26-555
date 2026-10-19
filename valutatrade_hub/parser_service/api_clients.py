@@ -77,15 +77,17 @@ class BaseApiClient(ABC):
             )
         except requests.exceptions.Timeout:
             raise ApiRequestError(
-                f"{self.source_name}: превышен таймаут "
-                f"{self.config.REQUEST_TIMEOUT} с"
+                f"{self.source_name}: превышен таймаут {self.config.REQUEST_TIMEOUT} с"
             ) from None
         except requests.exceptions.ConnectionError:
             raise ApiRequestError(
                 f"{self.source_name}: нет соединения с сервером (проверьте сеть)"
             ) from None
         except requests.exceptions.RequestException as error:
-            raise ApiRequestError(f"{self.source_name}: {error}") from None
+            # Текст исключения не выводим: в нём может оказаться URL с API-ключом.
+            raise ApiRequestError(
+                f"{self.source_name}: сетевая ошибка ({type(error).__name__})"
+            ) from None
 
         meta = {
             "request_ms": int((time.perf_counter() - started) * MS_IN_SECOND),
@@ -186,17 +188,19 @@ class ExchangeRateApiClient(BaseApiClient):
         API отдаёт, сколько единиц валюты стоит 1 USD (USD→EUR = 0.927),
         поэтому курс пары EUR_USD вычисляется как 1 / 0.927.
 
+        Если ключ EXCHANGERATE_API_KEY не задан, запрос идёт на открытый
+        эндпоинт EXCHANGERATE_OPEN_URL (тот же формат ответа, без ключа).
+
         Raises:
-            ApiRequestError: Нет ключа, ошибка сети/API или неверный ответ.
+            ApiRequestError: Ошибка сети/API (неверный ключ, лимит) или
+                неверный ответ.
         """
         api_key = self.config.EXCHANGERATE_API_KEY
-        if not api_key:
-            raise ApiRequestError(
-                f"{self.source_name}: не задан API-ключ "
-                "(переменная окружения EXCHANGERATE_API_KEY)"
-            )
         base = self.config.BASE_CURRENCY
-        url = f"{self.config.EXCHANGERATE_API_URL}/{api_key}/latest/{base}"
+        if api_key:
+            url = f"{self.config.EXCHANGERATE_API_URL}/{api_key}/latest/{base}"
+        else:
+            url = f"{self.config.EXCHANGERATE_OPEN_URL}/latest/{base}"
         data, meta = self._get_json(url)
         if not isinstance(data, dict) or data.get("result") != "success":
             error_type = data.get("error-type") if isinstance(data, dict) else None
